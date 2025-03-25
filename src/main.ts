@@ -7,6 +7,7 @@ import {
   Camera,
   DirectionalLight,
   DirectionalLightHelper,
+  DoubleSide,
   Mesh,
   MeshBasicMaterial,
   MeshLambertMaterial,
@@ -33,6 +34,8 @@ import GridMesh from "./GridMesh/GridMesh";
 const cameraUpAxis = new Vector3(0, 0, 1);
 const cameraInitialPosition = new Vector3(-5, -5, 1);
 const cameraPointToLookAt = new Vector3(0, 0, 0);
+
+const maxNumberOfFloors = 15;
 
 /**
  * We have defined a <canvas> element in index.html.
@@ -279,7 +282,9 @@ scene.add(ambientLight);
  * https://threejs.org/docs/index.html?q=mesh#api/en/objects/Mesh
  */
 
-//Your code here
+const plane = new PlaneGeometry(GRID_SIZE.x, GRID_SIZE.y);
+const planeMesh = new Mesh(plane, new MeshLambertMaterial({ color: "#097805", side: DoubleSide }));
+scene.add(planeMesh);
 
 /**
  * ====== TASK 10b ======
@@ -299,9 +304,8 @@ scene.add(ambientLight);
  *
  * */
 
-// Code goes here
-
-// scene.add(new AxesHelper(10));
+scene.add(new AxesHelper(10));
+plane.translate(plane.parameters.width / 2, plane.parameters.height / 2, 0);
 
 /**
  * ====== TASK 11 ======
@@ -321,8 +325,9 @@ scene.add(ambientLight);
  */
 
 const sensibleCameraPosition = new Vector3(GRID_CENTER.x, GRID_CENTER.y - 70, 80);
-
-//Your code here
+camera.position.set(sensibleCameraPosition.x, sensibleCameraPosition.y, sensibleCameraPosition.z);
+orbitControls.target.set(GRID_CENTER.x, GRID_CENTER.y, 0);
+orbitControls.update();
 
 /**
  * ====== TASK 12 ======
@@ -341,9 +346,10 @@ const sensibleCameraPosition = new Vector3(GRID_CENTER.x, GRID_CENTER.y - 70, 80
  * "how to open console in my browser" to figure out how! :)
  */
 
-//const grid = ...
-
-//Your code here
+const grid = new Grid();
+grid.setCellValue(2, 5, 10);
+grid.setCellValue(12, 13, 5);
+grid.setCellValue(17, 18, 1);
 
 /**
  * ====== TASK 13 ======
@@ -359,8 +365,8 @@ const sensibleCameraPosition = new Vector3(GRID_CENTER.x, GRID_CENTER.y - 70, 80
  *   after you edit the grid
  */
 
-// const groupOfBoxes = new GroupOfBoxes(grid);
-// scene.add(groupOfBoxes);
+const groupOfBoxes = new GroupOfBoxes(grid);
+scene.add(groupOfBoxes);
 
 /**
  * ====== TASK 14 ======
@@ -397,14 +403,40 @@ const sensibleCameraPosition = new Vector3(GRID_CENTER.x, GRID_CENTER.y - 70, 80
  *
  * */
 
-canvas.addEventListener("mouseup", onmouseup);
-function onmouseup(event: MouseEvent) {
+const handleMouseUp = (event: MouseEvent) => {
   const positionInCanvas = findPositionInCanvas(event, canvas); // Canvas coordinate between (-1,-1) and (1,1)
 
-  //Your code here
+  const raycaster = new Raycaster();
+  raycaster.setFromCamera(positionInCanvas, camera);
+
+  // Get intersection between the ray and the objects
+  const mostRelevantIntersection = raycaster.intersectObjects([planeMesh, groupOfBoxes]).at(0);
+  if (!mostRelevantIntersection) {
+    return;
+  }
+
+  // Back to grid space
+  const { x, y } = worldCoordinatesToGridIndex(mostRelevantIntersection.point);
+  const currentNumberOfFloors = grid.getCellValue(x, y);
+
+  console.log(x, y, currentNumberOfFloors);
+
+  // Mutate the grid according to the operation
+  if (event.shiftKey) {
+    // We are decreasing
+    if (currentNumberOfFloors > 0) {
+      grid.setCellValue(x, y, currentNumberOfFloors - 1);
+    }
+  } else {
+    if (currentNumberOfFloors < maxNumberOfFloors) {
+      grid.setCellValue(x, y, currentNumberOfFloors + 1);
+    }
+  }
+  groupOfBoxes.update(grid);
 
   //viewScores(grid);
-}
+};
+canvas.addEventListener("mouseup", handleMouseUp);
 
 /**
  * Normalized device coordinate or NDC space is a screen independent display coordinate system;

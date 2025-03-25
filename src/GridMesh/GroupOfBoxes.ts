@@ -1,8 +1,7 @@
-import { BoxGeometry, FrontSide, Group, LineBasicMaterial, LineSegments, Mesh, MeshLambertMaterial, Vector3 } from "three";
+import { BoxGeometry, FrontSide, Group, LineBasicMaterial, LineSegments, Mesh, MeshLambertMaterial } from "three";
 import Grid from "../Grid";
 import { IGridMesh } from "./GridMesh";
 import { CELL_SIZE, GRID_CELL_COUNT } from "../constants";
-import * as THREE from "three";
 
 export const BOX_MATERIAL = new MeshLambertMaterial({
   side: FrontSide,
@@ -50,9 +49,18 @@ export default class GroupOfBoxes extends Group implements IGridMesh {
      *
      * When done, go back to main.ts and continue on the tasks there
      * */
-    const height = floors * CELL_SIZE.z;
 
-    //Your code here
+    const box = new BoxGeometry(CELL_SIZE.x, CELL_SIZE.y, floors * CELL_SIZE.z);
+
+    // Place the box in the correct grid position
+    box.translate(gridIndexX * CELL_SIZE.x, gridIndexY * CELL_SIZE.y, 0);
+
+    // Offset to put the origin in the lower left corner
+    box.translate(box.parameters.width / 2, box.parameters.height / 2, box.parameters.depth / 2);
+
+    const mesh = new Mesh(box, BOX_MATERIAL);
+
+    this.add(mesh);
   }
 
   cleanup() {
