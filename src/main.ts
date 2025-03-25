@@ -419,8 +419,6 @@ const handleMouseUp = (event: MouseEvent) => {
   const { x, y } = worldCoordinatesToGridIndex(mostRelevantIntersection.point);
   const currentNumberOfFloors = grid.getCellValue(x, y);
 
-  console.log(x, y, currentNumberOfFloors);
-
   // Mutate the grid according to the operation
   if (event.shiftKey) {
     // We are decreasing
@@ -434,7 +432,7 @@ const handleMouseUp = (event: MouseEvent) => {
   }
   groupOfBoxes.update(grid);
 
-  //viewScores(grid);
+  viewScores(grid);
 };
 canvas.addEventListener("mouseup", handleMouseUp);
 
