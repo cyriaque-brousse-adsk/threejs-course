@@ -68,10 +68,12 @@ const frustumNearPlane = 0.1;
 const frustumFarPlane = 1000;
 
 //Your code here
+const camera = new PerspectiveCamera(fov, aspectRatio, frustumNearPlane, frustumFarPlane);
+camera.up = cameraUpAxis;
+camera.position.copy(cameraInitialPosition);
+camera.lookAt(cameraPointToLookAt);
 
-// camera.up = cameraUpAxis;
-// camera.position.copy(cameraInitialPosition);
-// camera.lookAt(cameraPointToLookAt);
+const scene = new Scene();
 
 /**
  * ====== TASK 2 ======
@@ -98,7 +100,8 @@ const frustumFarPlane = 1000;
  *
  * */
 
-//Your code here
+const renderer = new WebGLRenderer({ canvas });
+renderer.render(scene, camera);
 
 /**
  * ====== TASK 3 ======
@@ -113,7 +116,11 @@ const frustumFarPlane = 1000;
  * - Make sure to call the render() method on the renderer again to tell three.js to render what we have given it
  * */
 
-//Your code here
+const box = new BoxGeometry(2, 1, 3);
+const material = new MeshLambertMaterial({ color: "#ffc400" });
+const cube = new Mesh(box, material);
+scene.add(cube);
+renderer.render(scene, camera);
 
 /**
  * ====== TASK 4 ======
@@ -127,7 +134,7 @@ const frustumFarPlane = 1000;
  *
  * */
 
-//Your code here
+renderer.setSize(window.innerWidth, window.innerHeight);
 
 /**
  * ====== TASK 4b ======
@@ -137,7 +144,7 @@ const frustumFarPlane = 1000;
  * What about a nice "SkyBlue"?
  * */
 
-//Your code here
+renderer.setClearColor("SkyBlue");
 
 /**
  * ====== TASK 5 ======
@@ -156,10 +163,12 @@ const frustumFarPlane = 1000;
  * save computation time for other important tasks.
  * */
 
-function animate() {
+const animate = () => {
   // Your code here
+  renderer.render(scene, camera);
+
   requestAnimationFrame(animate);
-}
+};
 animate();
 
 // Play around with position here!
@@ -180,7 +189,7 @@ animate();
  * Docs: https://threejs.org/docs/?q=orbit#examples/en/controls/OrbitControls
  * */
 
-//Your code here
+const orbitControls = new OrbitControls(camera, canvas);
 
 /**
  * ====== TASK 7 ======
@@ -194,7 +203,7 @@ animate();
  * Docs: https://threejs.org/docs/index.html?q=meshb#api/en/materials/MeshBasicMaterial.color
  * */
 
-//Your code here
+cube.material.color.set("white");
 
 /**
  * ====== TASK 8 ======
@@ -217,7 +226,9 @@ animate();
  * https://threejs.org/docs/index.html?q=direct#api/en/lights/DirectionalLight
  */
 
-//Your code here
+const directionalLight = new DirectionalLight("white", 0.7);
+directionalLight.position.set(-2, -5, 10);
+scene.add(directionalLight);
 
 /**
  * ====== TASK 9 ======
@@ -233,7 +244,8 @@ animate();
  * Docs: https://threejs.org/docs/index.html#api/en/lights/AmbientLight
  * */
 
-//Your code here
+const ambientLight = new AmbientLight("white", 0.4);
+scene.add(ambientLight);
 
 /**
  * ====== TASK 10 ======
