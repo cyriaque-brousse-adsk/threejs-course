@@ -15,6 +15,7 @@ import {
   PlaneGeometry,
   Raycaster,
   Scene,
+  TextureLoader,
   Vector2,
   Vector3,
   WebGLRenderer,
@@ -283,7 +284,7 @@ scene.add(ambientLight);
  */
 
 const plane = new PlaneGeometry(GRID_SIZE.x, GRID_SIZE.y);
-const planeMesh = new Mesh(plane, new MeshLambertMaterial({ color: "#097805", side: DoubleSide }));
+const planeMesh = new Mesh(plane, new MeshLambertMaterial({ color: "lightgreen", side: DoubleSide }));
 scene.add(planeMesh);
 
 /**
@@ -406,6 +407,10 @@ scene.add(groupOfBoxes);
 const handleMouseUp = (event: MouseEvent) => {
   const positionInCanvas = findPositionInCanvas(event, canvas); // Canvas coordinate between (-1,-1) and (1,1)
 
+  if (movedWhileClicking(mouseDownPositionInCanvas, positionInCanvas)) {
+    return;
+  }
+
   const raycaster = new Raycaster();
   raycaster.setFromCamera(positionInCanvas, camera);
 
@@ -468,7 +473,7 @@ function worldCoordinatesToGridIndex(worldCoordinates: Vector3) {
  * - Uncomment the line below and make sure the parameter names match yours.
  * */
 
-//listenForButtonClicks(groupOfBoxes, renderer, scene, camera, grid);
+listenForButtonClicks(groupOfBoxes, renderer, scene, camera, grid);
 
 /**
  * ====== TASK 15 ======
@@ -512,6 +517,8 @@ function movedWhileClicking(down: Vector2, up: Vector2): boolean {
  * - https://threejs.org/docs/?q=material#api/en/materials/MeshLambertMaterial.map
  *
  * */
+const constraintTexture = new TextureLoader().load("constraints.png");
+planeMesh.material.map = constraintTexture;
 
 /**
  * Extra tasks for the fast ones!
