@@ -537,10 +537,10 @@ planeMesh.material.map = constraintTexture;
 // const constraintMesh = new ConstraintMesh(constraintGrid);
 // scene.add(constraintMesh);
 
-// const loader = new GLTFLoader();
-// const fox = await loader.loadAsync("Fox.glb");
-//
-// scene.add(fox.scene);
+const loader = new GLTFLoader();
+const fox = await loader.loadAsync("Fox.glb");
+
+scene.add(fox.scene);
 
 document.getElementById("viewConstraints")?.addEventListener("click", () => {
   viewConstraints(constraintGrid);
